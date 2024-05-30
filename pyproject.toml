@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "essay-judge"
+version = "0.1.0"
+description = ""
+authors = ["Yen-Ting Li <ytli.tw@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain-community = "^0.2.1"
+langchain-openai = "^0.1.8"
+google-auth-oauthlib = "^1.2.0"
+google-api-python-client = "^2.131.0"
+google-auth-httplib2 = "^0.2.0"
+
+[tool.poetry.plugins.dotenv]
+ignore = "false"
+location = ".env"
+
+[tool.poetry.scripts]
+send = "essay_judge.mail:send_mail"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
