@@ -18,6 +18,7 @@ ignore = "false"
 location = ".env"
 
 [tool.poetry.scripts]
+start = "essay_judge.main:main"
 send = "essay_judge.mail:send_mail"
 
 [build-system]
