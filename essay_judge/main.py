@@ -21,7 +21,8 @@ def main():
 def process_essay(to: str, subject: str, essay_path: str, instruction: str):
     essay_content = read_file(essay_path)
     answer = chain.invoke({"input": essay_content, "instruction": instruction})
+    print(answer)
     mail = Mail(to=to, subject=subject, content="評語：\n" + answer.content)
-    res = send_mail(mail)
-    print(res)
+    # res = send_mail(mail)
+    print("OK")
 

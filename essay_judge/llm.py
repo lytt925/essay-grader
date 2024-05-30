@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
-chatModel = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2)
+chatModel = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.01)
 
 
 # Build templates
