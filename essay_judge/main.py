@@ -11,10 +11,17 @@ def main():
 
     essay_content = read_file(args.essay_path)
 
-    answer = chain.invoke({"input": essay_content})
+    answer = chain.invoke({"input": essay_content, "instruction": "請就這篇文章的文章內容、文章結構和英文文法，給一個60-100字的台灣繁體中文評語，並給出分數。"})
     print(answer)
 
     mail = Mail(to="r12227113@ntu.edu.tw", subject="評語", content="評語：" + answer.content)
+    res = send_mail(mail)
+    print(res)
+
+def process_essay(to: str, subject: str, essay_path: str, instruction: str):
+    essay_content = read_file(essay_path)
+    answer = chain.invoke({"input": essay_content, "instruction": instruction})
+    mail = Mail(to=to, subject=subject, content="評語：\n" + answer.content)
     res = send_mail(mail)
     print(res)
 

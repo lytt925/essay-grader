@@ -6,7 +6,7 @@ authors = ["Yen-Ting Li <ytli.tw@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 langchain-community = "^0.2.1"
 langchain-openai = "^0.1.8"
 google-auth-oauthlib = "^1.2.0"

@@ -4,8 +4,21 @@ from langchain_core.prompts import ChatPromptTemplate
 chatModel = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2)
 
 
+# Build templates
+system_template = """
+請根據以下指令批改文章：
+「{instruction}」
+"""
+
+human_template = "{text}"
+
+chat_prompt = ChatPromptTemplate.from_messages([
+    ("system", system_template),
+    ("human", human_template),
+])
+
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "請就這篇文章的文章內容、文章結構和英文文法，給一個60-100字的台灣繁體中文評語，並給出分數。"),
+    ("system", system_template),
     ("user", "「{input}」")
 ])
 
