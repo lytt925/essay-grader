@@ -2,6 +2,8 @@ from argparse import ArgumentParser
 from llm import chain
 from mail import Mail, send_mail
 from reader import read_file
+import json
+import os
 
 
 def main():
@@ -10,17 +12,46 @@ def main():
                         help="The essay document", default="")
     parser.add_argument("-i", "--instruction", help="The instruction text")
 
+    # Parse the arguments
     args = parser.parse_args()
 
-    essay_content = read_file(args.essay_path)
-    if len(args.instruction) != 0:
+    if args.instruction != None:
         instruction = args.instruction
     else:
         instruction = "請就這篇文章的文章內容、文章結構和英文文法，給一個60-100字的台灣繁體中文評語，並給出分數。"
 
-    answer = chain.invoke(
-        {"input": essay_content, "instruction": instruction})
-    print("=================\n", answer)
+    # Read the essay content from the file
+    essay_collection = read_file(args.essay_path)
+    for id in essay_collection:
+        essay_content = essay_collection[id]
+
+    # Read existing data from JSON file if it exists
+    output_file = 'answer.json'
+
+    # read output_file to dict
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as f:
+            results = json.load(f)
+    else:
+        results = []
+
+    print("results", type(results))
+
+    for id, essay_content in essay_collection.items():
+        answer = chain.invoke(
+            {"input": essay_content, "instruction": instruction})
+        print("=================\n", answer)
+
+        answer_dict = {
+            "id": id,
+            "content": answer.content,
+        }
+
+        results.append(answer_dict)
+
+    # Write updated data back to JSON file
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False, indent=4)
 
     # mail = Mail(to="r12227113@ntu.edu.tw", subject="評語",
     #             content="評語：" + answer.content)
