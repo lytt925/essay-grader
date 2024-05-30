@@ -8,6 +8,7 @@ from google.auth.transport.requests import Request
 from pydantic import BaseModel
 import os
 
+
 class Mail(BaseModel):
     to: str
     subject: str
@@ -20,6 +21,7 @@ SCOPES = [
     'https://www.googleapis.com/auth/userinfo.profile',
     "https://www.googleapis.com/auth/gmail.send"
 ]
+
 
 def send_mail(mail: Mail):
     creds = None
@@ -47,7 +49,8 @@ def send_mail(mail: Mail):
     # message = MIMEText('This is the body of the email')
     message['to'] = mail.to
     message['subject'] = mail.subject
-    create_message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
+    create_message = {'raw': base64.urlsafe_b64encode(
+        message.as_bytes()).decode()}
 
     try:
         message = (
@@ -55,15 +58,18 @@ def send_mail(mail: Mail):
                    .messages()
                    .send(userId="me", body=create_message)
                    .execute()
-            )
+        )
         return {"message": "Email sent successfully"}
     except HTTPError as error:
         print(f"An error occurred: {error}")
 
+
 def main():
-    mail = Mail(to="r12227113@ntu.edu.tw", subject="Test", content="This is a test email")
+    mail = Mail(to="r12227113@ntu.edu.tw", subject="Test",
+                content="This is a test email")
     res = send_mail(mail)
     print(res)
+
 
 if __name__ == "__main__":
     main()
