@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
 import threading
+import os
 from essay_judge.mail import Mail, send_mail
-from essay_judge.reader import read_file
-from essay_judge.llm import chain
-# from essay_judge.main import process_essay
+from essay_judge.process_essay import process_essay, process_essay_batch
 
 class Interface:
     def __init__(self, root):
@@ -18,6 +17,8 @@ class Interface:
         self.frame.grid_rowconfigure(3, weight=1)  # Allow the row with the instructions to expand
         self.frame.grid_rowconfigure(5, weight=1)  # Allow the row with the result to expand
 
+        self.last_selected_directory = None
+
         self.setup_widgets()
 
     def setup_widgets(self):
@@ -25,7 +26,7 @@ class Interface:
         tk.Label(self.frame, text="File Path:").grid(row=0, column=0, sticky='w')
         self.filepath_entry = tk.Entry(self.frame, width=20)
         self.filepath_entry.grid(row=0, column=1, sticky='we')
-        self.browse_button = tk.Button(self.frame, text="Browse", command=self.browse_file)
+        self.browse_button = tk.Button(self.frame, text="Browse", command=self.browse_dir)
         self.browse_button.grid(row=0, column=2)
 
         # Email
@@ -59,13 +60,21 @@ class Interface:
         # Disable all inputs and the grade button
         self.toggle_inputs(False)
         filepath = self.filepath_entry.get()
-        email = self.email_entry.get()
-        mail_subject = self.mail_subject_entry.get()
         instruction = self.instruction_text.get("1.0", tk.END).strip()
 
-        process_thread = threading.Thread(target=self.process_essay_thread, args=(email, mail_subject, filepath, instruction))
+        process_thread = threading.Thread(target=self.process_essay_thread, args=(filepath, instruction))
         process_thread.start()
 
+    def browse_dir(self):
+        initial_directory = self.last_selected_directory if self.last_selected_directory else os.path.expanduser('~/Documents')
+        dirpath = filedialog.askdirectory(
+            title="Select a directory",
+            initialdir=initial_directory
+        )
+        if dirpath:
+            self.filepath_entry.delete(0, 'end')
+            self.filepath_entry.insert(0, dirpath)
+            self.last_selected_directory = dirpath
 
     def browse_file(self):
         filepath = filedialog.askopenfilename(
@@ -89,23 +98,15 @@ class Interface:
         self.result_text.delete('1.0', tk.END)  # Clear existing content
         self.result_text.insert('1.0', content)  # Insert new content
 
-    def process_essay_thread(self, email, mail_subject, filepath, instruction):
-        result = self.process_essay(email, mail_subject, filepath, instruction)
+    def process_essay_thread(self, filepath, instruction):
+        results = process_essay_batch(filepath, instruction)
         # Use root.after to safely update GUI from a non-main thread
         self.root.after(0, self.toggle_inputs, True)
-        self.root.after(0, self.update_result_area, result["content"])
-
-    def process_essay(self, to: str, subject: str, essay_path: str, instruction: str):
-        print(to, subject, essay_path, instruction)
-        essay_content = read_file(essay_path)
-        answer = chain.invoke({"input": essay_content, "instruction": instruction})
-        print(answer)
-        return {"content": answer.content}
+        self.root.after(0, self.update_result_area, results[0]["content"])
 
     def send_action(self):
         # Disable all inputs and the grade button
         self.toggle_inputs(False)
-        filepath = self.filepath_entry.get()
         email = self.email_entry.get()
         mail_subject = self.mail_subject_entry.get()
         result = self.result_text.get("1.0", tk.END).strip()

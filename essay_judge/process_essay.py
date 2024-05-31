@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
-from llm import chain
-from mail import Mail, send_mail
-from reader import read_file
+from .llm import chain
+from .reader import read_file
 import json
 import os
 
@@ -40,7 +39,6 @@ def main():
     for id, essay_content in essay_collection.items():
         answer = chain.invoke(
             {"input": essay_content, "instruction": instruction})
-        print("=================\n", answer)
 
         answer_dict = {
             "id": id,
@@ -58,14 +56,42 @@ def main():
     # res = send_mail(mail)
     # print(res)
 
+def save_results(new_results, output_file = 'answer.json'):
+    # read output_file to dict
+    if os.path.exists(output_file):
+        with open(output_file, 'r', encoding='utf-8') as f:
+            results = json.load(f)
+    else:
+        results = []
 
-def process_essay(to: str, subject: str, essay_path: str, instruction: str):
-    essay_content = read_file(essay_path)
+    results.extend(new_results)
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(results, f, ensure_ascii=False, indent=4)
+
+def process_essay(essay_filepath: str, instruction: str):
+    essay_content = read_file(essay_filepath)
     answer = chain.invoke({"input": essay_content, "instruction": instruction})
     print(answer)
-    mail = Mail(to=to, subject=subject, content="評語：\n" + answer.content)
-    # res = send_mail(mail)
-    print("OK")
+    return {"content": answer.content}
+
+
+def process_essay_batch(essays_path: str, instruction: str):
+    essay_collection = read_file(essays_path)
+
+    results = []
+    for id, essay_content in essay_collection.items():
+        answer = chain.invoke(
+            {"input": essay_content, "instruction": instruction})
+
+        answer_dict = {
+            "id": id,
+            "content": answer.content,
+        }
+
+        results.append(answer_dict)
+
+    print(results)
+    return results
 
 
 if __name__ == "__main__":

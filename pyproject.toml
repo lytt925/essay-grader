@@ -12,6 +12,7 @@ langchain-openai = "^0.1.8"
 google-auth-oauthlib = "^1.2.0"
 google-api-python-client = "^2.131.0"
 google-auth-httplib2 = "^0.2.0"
+textract = "^1.6.5"
 
 [tool.poetry.plugins.dotenv]
 ignore = "false"

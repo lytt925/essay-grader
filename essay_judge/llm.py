@@ -9,13 +9,6 @@ system_template = """
 「{instruction}」
 """
 
-human_template = "{text}"
-
-chat_prompt = ChatPromptTemplate.from_messages([
-    ("system", system_template),
-    ("human", human_template),
-])
-
 prompt = ChatPromptTemplate.from_messages([
     ("system", system_template),
     ("user", "「{input}」")
