@@ -126,7 +126,7 @@ def add_methods(cls):
             "essay_collections": self.essay_collections
         }
         self.after(0, self.toggle_inputs, True)
-        save_to_json('data.json', new_records)
+        save_to_json('./results/data.json', new_records)
 
     def open_confirmation(self):
         # Create a top-level window for the confirmation dialog

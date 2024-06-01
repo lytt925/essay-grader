@@ -17,7 +17,7 @@ class Interface(tk.Tk):
         self.load_history()
 
     def load_history(self):
-        historys = load_from_json('data.json')
+        historys = load_from_json('./results/data.json')
         if len(historys) == 0:
             return
         self.history = historys[-1]
