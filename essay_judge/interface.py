@@ -128,22 +128,51 @@ def add_methods(cls):
         self.after(0, self.toggle_inputs, True)
         save_to_json('data.json', new_records)
 
-    def send_action(self):
+    def open_confirmation(self):
+        # Create a top-level window for the confirmation dialog
+        confirmation_window = tk.Toplevel(self)
+        confirmation_window.title("Confirm Send Mail")
+        confirmation_window.geometry("300x200")
+
+        # Message Label
+        label = tk.Label(confirmation_window, text="Are you sure you want to send the email?")
+        label.pack(pady=10, fill=tk.X)
+
+        to = "To: " + self.name_dropdown.get() + "@ntu.edu.tw"
+        subject = 'Email Subject: ' + self.entry_emailsubject.get()
+
+        # Email Address Label
+        self.label_confirm_to = tk.Label(confirmation_window, text=to, anchor="w")
+        self.label_confirm_to.pack(fill=tk.X, padx=15, pady=5)  # Fill in the X direction
+        
+        self.label_confirm_subject = tk.Label(confirmation_window, text=subject, anchor="w")
+        self.label_confirm_subject.pack(fill=tk.X, padx=15, pady=5)  # Fill in the X direction
+
+        # Send Button
+        send_btn = tk.Button(confirmation_window, text="Send", command=lambda: self.send_action(confirmation_window))
+        send_btn.pack(side="left", padx=10, pady=10)
+
+        # Cancel Button
+        cancel_btn = tk.Button(confirmation_window, text="Cancel", command=confirmation_window.destroy)
+        cancel_btn.pack(side="right", padx=10, pady=10)
+
+
+    def send_action(self, confirmation_window):
         # Disable all inputs and the grade button
         self.toggle_inputs(False)
         email = self.name_dropdown.get() + "@ntu.edu.tw"
-        mail_subject = self.mail_subject_entry.get()
-        result = self.result_text.get("1.0", tk.END).strip()
+        mail_subject = self.entry_emailsubject.get()
+        result = self.text_result.get("1.0", tk.END).strip()
         mail = Mail(to=email, subject=mail_subject, content="評語：\n\n" + result)
 
         send_thread = threading.Thread(target=self.tk_send_mail_thread, args=(mail,))
         send_thread.start()
+        confirmation_window.destroy()
 
     def tk_send_mail_thread(self, mail):
         res = send_mail(mail)
         print("OK:", res)
-        # Use root.after to safely update GUI from a non-main thread
-        self.root.after(0, self.toggle_inputs, True)
+        self.after(0, self.toggle_inputs, True)
         return {"message": "Email sent successfully"}
 
 
@@ -160,5 +189,6 @@ def add_methods(cls):
     cls.send_action = send_action
     cls.tk_send_mail_thread = tk_send_mail_thread
     cls.on_essay_select = on_essay_select
+    cls.open_confirmation = open_confirmation
 
     return cls

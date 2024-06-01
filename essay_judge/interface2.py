@@ -114,7 +114,7 @@ class Interface(tk.Tk):
         self.button_regrade.grid(row=4, column=0, padx=(20, 10), pady=20, sticky="ew")
 
 
-        self.button_send = tk.Button(self.right_frame, text="Send Mail", command=self.send_action)
+        self.button_send = tk.Button(self.right_frame, text="Send Mail", command=self.open_confirmation)
         self.button_send.grid(row=4, column=1, columnspan=2, padx=(10, 20), pady=20, sticky="e")
 
 
