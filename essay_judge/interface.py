@@ -7,34 +7,33 @@ from essay_judge.process_essay import  grade_batch
 
 
 def add_methods(cls):
+    def validate_input(self, filepath, instruction):
+        # Validate filepath and instructions
+        if not filepath or instruction == "請在這裡輸入評分標準\n\n" or instruction == "":
+            self.toggle_inputs(True)
+            return False
+        return True
+
+    def start_grading_thread(self, filepath, instruction):
+        # Start the thread for grading
+        process_thread = threading.Thread(target=self.grade_all_thread, args=(filepath, instruction))
+        process_thread.start()
+
     def grade_all(self):
-        # Disable all inputs and the grade button
         self.toggle_inputs(False)
         filepath = self.entry_filepath.get()
         instruction = self.text_instruction.get("1.0", tk.END).strip()
-        print("instruction", instruction)
-        if not filepath or instruction == "請在這裡輸入評分標準\n\n" or instruction == "":
-            self.toggle_inputs(True)
-            return
+        if self.validate_input(filepath, instruction):
+            self.start_grading_thread(filepath, instruction)
 
-        process_thread = threading.Thread(target=self.grade_all_thread, args=(filepath, instruction))
-        process_thread.start()
-    
     def grade_one(self):
         self.toggle_inputs(False)
         current_id = self.name_dropdown.get()
-        if (current_id == ""):
-            self.toggle_inputs(True)
-            return
-        filepath = self.essay_collections[current_id]['filename']
-        print("filepath", filepath)
-        instruction = self.text_instruction.get("1.0", tk.END).strip()
-        print("instruction", instruction)
-        if not filepath or instruction == "請在這裡輸入評分標準\n\n" or instruction == "":
-            self.toggle_inputs(True)
-            return
-        process_thread = threading.Thread(target=self.grade_all_thread, args=(filepath, instruction))
-        process_thread.start()
+        if current_id:
+            filepath = self.essay_collections[current_id]['filename']
+            instruction = self.text_instruction.get("1.0", tk.END).strip()
+            if self.validate_input(filepath, instruction):
+                self.start_grading_thread(filepath, instruction)
 
     def browse_dir(self):
         initial_directory = self.last_selected_directory if self.last_selected_directory else os.path.expanduser('~/Desktop/course1122/ComputationalLinguistics/Final Project/essay-local/essay-judge/essays')
@@ -139,6 +138,8 @@ def add_methods(cls):
 
     cls.grade_all = grade_all
     cls.grade_one = grade_one
+    cls.validate_input = validate_input
+    cls.start_grading_thread = start_grading_thread
     cls.browse_dir = browse_dir
     cls.next_essay = next_essay
     cls.browse_file = browse_file
