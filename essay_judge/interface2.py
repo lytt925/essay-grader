@@ -3,7 +3,7 @@ from tkinter import filedialog, scrolledtext
 import threading, os
 from essay_judge.mail import Mail, send_mail
 from essay_judge.interface import add_methods
-
+from essay_judge.records import load_from_json
 from tkinter import ttk
 
 class Interface(tk.Tk):
@@ -14,6 +14,32 @@ class Interface(tk.Tk):
         self.create_panes()
         self.last_selected_directory = None
         self.essay_collections = {}
+        self.load_history()
+
+    def load_history(self):
+        historys = load_from_json('data.json')
+        if len(historys) == 0:
+            return
+        self.history = historys[-1]
+
+        self.last_selected_directory = self.history['dirpath']
+        self.entry_filepath.insert(0, self.last_selected_directory)
+        instruction = self.history['instruction']
+        self.text_instruction.delete("1.0", tk.END)
+        self.text_instruction.insert(tk.END, instruction)
+
+        for id, essay_collection in self.history['essay_collections'].items():
+            # check if the file still exists
+            if os.path.exists(essay_collection['filename']):
+                self.essay_collections[id] = essay_collection
+
+        # update the dropdown
+        self.name_dropdown['values'] = list(self.essay_collections.keys())
+        self.name_dropdown.current(0)
+
+        # update the result
+        self.update_result_area()
+
         
     def create_panes(self):
         self.pane = tk.PanedWindow(self, orient=tk.HORIZONTAL, sashrelief=tk.RAISED)
@@ -42,12 +68,14 @@ class Interface(tk.Tk):
         # Instruction Widgets
         self.label_instruction = tk.Label(self.left_frame, text="Instruction:")
         self.label_instruction.grid(row=1, column=0, sticky="w", padx=10, pady=5)
-        self.text_instruction = tk.Text(self.left_frame, height=10, wrap=tk.WORD, font=("Arial", 14))
+        self.text_instruction = tk.Text(self.left_frame, height=10, wrap=tk.WORD, font=("Arial", 14), padx=10, pady=10)
         self.text_instruction.insert(tk.END, "請在這裡輸入評分標準\n\n")
         self.text_instruction.grid(row=2, column=0, columnspan=3, sticky="nsew", padx=(10, 15), pady=5)
 
+        self.progress_bar = ttk.Progressbar(self.left_frame, orient="horizontal", length=200, mode='determinate')
+        self.progress_bar.grid(row=3, column=0, columnspan=3, padx=(20, 25), pady=(3, 3), sticky="ew")
         self.button_grade = tk.Button(self.left_frame, text="Grade All", command=self.grade_all)
-        self.button_grade.grid(row=3, column=1, columnspan=1, pady=20)
+        self.button_grade.grid(row=4, column=1, columnspan=1, pady=20)
 
     def setup_right_frame(self):
         # Configure column weights
@@ -74,13 +102,17 @@ class Interface(tk.Tk):
         # Result Widgets
         self.label_result = tk.Label(self.right_frame, text="Result:")
         self.label_result.grid(row=2, column=0, sticky="w", padx=10, pady=5)
-        self.text_result = tk.Text(self.right_frame, height=10, wrap=tk.WORD, font=("Arial", 12))
+        self.text_result = tk.Text(self.right_frame, height=10, wrap=tk.WORD, font=("Arial", 12), padx=8, pady=8)
         self.text_result.grid(row=3, column=0, columnspan=3, sticky="nsew", padx=10, pady=5)
 
-        self.button_view = tk.Button(self.right_frame, text="View Essay")
-        self.button_view.grid(row=4, column=0, padx=(20, 10), pady=20, sticky="ew")
-        self.button_regrade = tk.Button(self.right_frame, text="Regrade", command=self.grade_one)
-        self.button_regrade.grid(row=4, column=1, padx=(2, 10), pady=5, sticky="w")
+        # self.button_view = tk.Button(self.right_frame, text="View Essay")
+        # self.button_view.grid(row=4, column=0, padx=(20, 10), pady=20, sticky="ew")
+        # self.button_regrade = tk.Button(self.right_frame, text="Regrade", command=self.grade_one)
+        # self.button_regrade.grid(row=4, column=1, padx=(2, 10), pady=5, sticky="w")
+
+        self.button_regrade = tk.Button(self.right_frame, text="Grade this", command=self.grade_one)
+        self.button_regrade.grid(row=4, column=0, padx=(20, 10), pady=20, sticky="ew")
+
 
         self.button_send = tk.Button(self.right_frame, text="Send Mail", command=self.send_action)
         self.button_send.grid(row=4, column=1, columnspan=2, padx=(10, 20), pady=20, sticky="e")

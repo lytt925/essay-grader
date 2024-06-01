@@ -34,8 +34,6 @@ def main():
     else:
         results = []
 
-    print("results", type(results))
-
     for id, essay_content in essay_collection.items():
         answer = chain.invoke(
             {"input": essay_content, "instruction": instruction})
@@ -56,7 +54,7 @@ def main():
     # res = send_mail(mail)
     # print(res)
 
-def save_results(new_results, output_file = 'answer.json'):
+def save_results(new_results, output_file = 'data.json'):
     # read output_file to dict
     if os.path.exists(output_file):
         with open(output_file, 'r', encoding='utf-8') as f:
@@ -81,25 +79,6 @@ def grade_batch(essays_path: str, instruction: str):
         }
 
         yield answer_dict  # Yield the result immediately
-
-# def grade_batch(essays_path: str, instruction: str) -> list:
-#     essay_collection = read_files(essays_path)
-
-#     results = []
-#     for id, essay_content in essay_collection.items():
-#         answer = chain.invoke(
-#             {"input": essay_content, "instruction": instruction})
-
-#         answer_dict = {
-#             "id": id,
-#             "grade_content": answer.content,
-#         }
-
-#         results.append(answer_dict)
-
-#     print(results)
-#     return results
-
 
 if __name__ == "__main__":
     main()
