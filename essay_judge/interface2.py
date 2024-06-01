@@ -77,10 +77,10 @@ class Interface(tk.Tk):
         self.text_result = tk.Text(self.right_frame, height=10, wrap=tk.WORD, font=("Arial", 12))
         self.text_result.grid(row=3, column=0, columnspan=3, sticky="nsew", padx=10, pady=5)
 
-        self.button_regrade = tk.Button(self.right_frame, text="View Essay")
-        self.button_regrade.grid(row=4, column=0, padx=(20, 10), pady=20, sticky="ew")
-        self.button_next = tk.Button(self.right_frame, text="Regrade", command=self.next_essay)
-        self.button_next.grid(row=4, column=1, padx=(2, 10), pady=5, sticky="w")
+        self.button_view = tk.Button(self.right_frame, text="View Essay")
+        self.button_view.grid(row=4, column=0, padx=(20, 10), pady=20, sticky="ew")
+        self.button_regrade = tk.Button(self.right_frame, text="Regrade", command=self.grade_one)
+        self.button_regrade.grid(row=4, column=1, padx=(2, 10), pady=5, sticky="w")
 
         self.button_send = tk.Button(self.right_frame, text="Send Mail", command=self.send_action)
         self.button_send.grid(row=4, column=1, columnspan=2, padx=(10, 20), pady=20, sticky="e")

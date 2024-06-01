@@ -12,10 +12,27 @@ def add_methods(cls):
         self.toggle_inputs(False)
         filepath = self.entry_filepath.get()
         instruction = self.text_instruction.get("1.0", tk.END).strip()
+        print("instruction", instruction)
         if not filepath or instruction == "請在這裡輸入評分標準\n\n" or instruction == "":
             self.toggle_inputs(True)
             return
 
+        process_thread = threading.Thread(target=self.grade_all_thread, args=(filepath, instruction))
+        process_thread.start()
+    
+    def grade_one(self):
+        self.toggle_inputs(False)
+        current_id = self.name_dropdown.get()
+        if (current_id == ""):
+            self.toggle_inputs(True)
+            return
+        filepath = self.essay_collections[current_id]['filename']
+        print("filepath", filepath)
+        instruction = self.text_instruction.get("1.0", tk.END).strip()
+        print("instruction", instruction)
+        if not filepath or instruction == "請在這裡輸入評分標準\n\n" or instruction == "":
+            self.toggle_inputs(True)
+            return
         process_thread = threading.Thread(target=self.grade_all_thread, args=(filepath, instruction))
         process_thread.start()
 
@@ -49,13 +66,19 @@ def add_methods(cls):
             
             self.name_dropdown['values'] = list(self.essay_collections.keys())
             self.name_dropdown.current(0)
+
+        # focus back to the window
+        self.focus_force()
     
     def next_essay(self):
-        current_index = self.name_dropdown.current()
-        if len(self.essay_collection) == 0:
+        if len(self.essay_collections.keys()) == 0:
             return
-        next_index = (current_index + 1) % len(self.essay_collection)
+        current_index = self.name_dropdown.current()
+        next_index = (current_index + 1) % len(self.essay_collections.keys())
         self.name_dropdown.current(next_index)
+        if (current_index != next_index):
+            print("Selected:", self.name_dropdown.get())
+            self.update_result_area()
 
     def browse_file(self):
         filepath = filedialog.askopenfilename(
@@ -73,8 +96,8 @@ def add_methods(cls):
         self.button_browse.config(state='normal' if state else 'disabled')
         self.button_grade.config(state='normal' if state else 'disabled')
         self.button_regrade.config(state='normal' if state else 'disabled')
-        self.button_next.config(state='normal' if state else 'disabled')
-        self.name_dropdown.config(state='normal' if state else 'disabled')
+        # self.button_next.config(state='normal' if state else 'disabled')
+        # self.name_dropdown.config(state='normal' if state else 'disabled')
         self.button_send.config(state='normal' if state else 'disabled')
 
     # Change combobox value and update result area
@@ -90,11 +113,10 @@ def add_methods(cls):
         self.text_result.insert('1.0', content)  # Insert new content
 
     def grade_all_thread(self, filepath, instruction):
-        results = grade_batch(filepath, instruction)
-        for result in results:
+        for result in grade_batch(filepath, instruction):
             self.essay_collections[result["id"]]['grade_content'] = result["grade_content"]
+            self.after(0, self.update_result_area)
         self.after(0, self.toggle_inputs, True)
-        self.after(0, self.update_result_area)
 
     def send_action(self):
         # Disable all inputs and the grade button
@@ -116,6 +138,7 @@ def add_methods(cls):
 
 
     cls.grade_all = grade_all
+    cls.grade_one = grade_one
     cls.browse_dir = browse_dir
     cls.next_essay = next_essay
     cls.browse_file = browse_file

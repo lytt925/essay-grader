@@ -68,10 +68,9 @@ def save_results(new_results, output_file = 'answer.json'):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
 
-def grade_batch(essays_path: str, instruction: str) -> list:
+def grade_batch(essays_path: str, instruction: str):
     essay_collection = read_files(essays_path)
 
-    results = []
     for id, essay_content in essay_collection.items():
         answer = chain.invoke(
             {"input": essay_content, "instruction": instruction})
@@ -81,10 +80,25 @@ def grade_batch(essays_path: str, instruction: str) -> list:
             "grade_content": answer.content,
         }
 
-        results.append(answer_dict)
+        yield answer_dict  # Yield the result immediately
 
-    print(results)
-    return results
+# def grade_batch(essays_path: str, instruction: str) -> list:
+#     essay_collection = read_files(essays_path)
+
+#     results = []
+#     for id, essay_content in essay_collection.items():
+#         answer = chain.invoke(
+#             {"input": essay_content, "instruction": instruction})
+
+#         answer_dict = {
+#             "id": id,
+#             "grade_content": answer.content,
+#         }
+
+#         results.append(answer_dict)
+
+#     print(results)
+#     return results
 
 
 if __name__ == "__main__":

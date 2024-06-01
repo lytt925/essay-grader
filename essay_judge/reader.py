@@ -6,8 +6,9 @@ import os
 def read_files(filepath: str) -> dict:
     collection = {}
     if not os.path.isdir(filepath):
-        id = filepath.split("_")[0]
-        if filepath.endswith(".docx"):
+        filename = os.path.basename(filepath)
+        id = filename.split("_")[0]
+        if filename.endswith(".docx"):
             essay = textract.process(filepath)
             collection[id] = essay.decode("utf-8")
             return collection
