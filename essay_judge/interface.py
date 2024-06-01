@@ -126,7 +126,8 @@ class Interface(tk.Tk):
         self.text_result.grid(row=3, column=0, columnspan=3,
                               sticky="nsew", padx=10, pady=5)
 
-        self.button_view = tk.Button(self.right_frame, text="View Essay")
+        self.button_view = tk.Button(
+            self.right_frame, text="View Essay", command=self.view_essay)
         self.button_view.grid(row=4, column=0, padx=(
             20, 10), pady=20, sticky="ew")
         self.button_regrade = tk.Button(

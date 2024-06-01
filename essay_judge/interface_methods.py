@@ -171,6 +171,34 @@ def add_methods(cls):
             confirmation_window, text="Cancel", command=confirmation_window.destroy)
         cancel_btn.pack(side="right", padx=10, pady=10)
 
+    def view_essay(self):
+        # Create a top-level window for viewing the essay
+        self.essay_window = tk.Toplevel(self)
+        self.essay_window.title("View Essay")
+        self.essay_window.geometry("600x400+600+0")
+
+        # Text widget to display the essay
+        self.essay_text = tk.Text(self.essay_window, wrap=tk.WORD)
+        self.essay_text.pack(expand=True, fill=tk.BOTH)
+
+        # Initially populate the text widget with the current essay's text
+        current_id = self.name_dropdown.get()
+        original_text = self.essay_collections[current_id]['original_text']
+        self.essay_text.insert(tk.END, original_text)
+        self.essay_text.config(state=tk.DISABLED)
+
+        # Method to update the essay text when a new essay is selected
+        def update_essay_text(event):
+            current_id = self.name_dropdown.get()
+            original_text = self.essay_collections[current_id]['original_text']
+            self.essay_text.config(state=tk.NORMAL)
+            self.essay_text.delete(1.0, tk.END)
+            self.essay_text.insert(tk.END, original_text)
+            self.essay_text.config(state=tk.DISABLED)
+
+        # Bind the update method to the dropdown selection event
+        self.name_dropdown.bind("<<ComboboxSelected>>", update_essay_text)
+
     def send_action(self, confirmation_window):
         # Disable all inputs and the grade button
         self.toggle_inputs(False)
@@ -215,5 +243,6 @@ def add_methods(cls):
     cls.tk_send_mail_thread = tk_send_mail_thread
     cls.on_essay_select = on_essay_select
     cls.open_confirmation = open_confirmation
+    cls.view_essay = view_essay
 
     return cls
