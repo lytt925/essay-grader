@@ -3,18 +3,29 @@ import textract
 import os
 
 
-def read_file(filepath: str) -> dict:
+def read_files(filepath: str) -> dict:
     collection = {}
-    for file in os.listdir(filepath):
+    if not os.path.isdir(filepath):
+        id = filepath.split("_")[0]
+        if filepath.endswith(".docx"):
+            essay = textract.process(filepath)
+            collection[id] = essay.decode("utf-8")
+            return collection
+        
+    for file in os.listdir(os.path.expanduser(filepath)):
         id = file.split("_")[0]
-
         if file.endswith(".docx"):
-            essay = os.path.join(filepath, file)
+            essay = os.path.join(os.path.expanduser(filepath), file)
             essay = textract.process(essay)
             collection[id] = essay.decode("utf-8")
 
     return collection
 
-
-# filepath = "../essays/"
-# print(read_file(filepath))
+"""
+Collection = {
+    "1": "Essay content 1",
+    "2": "Essay content 2",
+    ...
+    "n": "Essay content n"
+}
+"""

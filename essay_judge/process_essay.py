@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from .llm import chain
-from .reader import read_file
+from .reader import read_files
 import json
 import os
 
@@ -20,7 +20,7 @@ def main():
         instruction = "請就這篇文章的文章內容、文章結構和英文文法，給一個60-100字的台灣繁體中文評語，並給出分數。"
 
     # Read the essay content from the file
-    essay_collection = read_file(args.essay_path)
+    essay_collection = read_files(args.essay_path)
     for id in essay_collection:
         essay_content = essay_collection[id]
 
@@ -68,15 +68,8 @@ def save_results(new_results, output_file = 'answer.json'):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
 
-def process_essay(essay_filepath: str, instruction: str):
-    essay_content = read_file(essay_filepath)
-    answer = chain.invoke({"input": essay_content, "instruction": instruction})
-    print(answer)
-    return {"content": answer.content}
-
-
-def process_essay_batch(essays_path: str, instruction: str):
-    essay_collection = read_file(essays_path)
+def grade_batch(essays_path: str, instruction: str) -> list:
+    essay_collection = read_files(essays_path)
 
     results = []
     for id, essay_content in essay_collection.items():
@@ -85,7 +78,7 @@ def process_essay_batch(essays_path: str, instruction: str):
 
         answer_dict = {
             "id": id,
-            "content": answer.content,
+            "grade_content": answer.content,
         }
 
         results.append(answer_dict)
