@@ -54,7 +54,8 @@ def main():
     # res = send_mail(mail)
     # print(res)
 
-def save_results(new_results, output_file = 'data.json'):
+
+def save_results(new_results, output_file='data.json'):
     # read output_file to dict
     if os.path.exists(output_file):
         with open(output_file, 'r', encoding='utf-8') as f:
@@ -66,6 +67,7 @@ def save_results(new_results, output_file = 'data.json'):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
 
+
 def grade_batch(essays_path: str, instruction: str):
     essay_collection = read_files(essays_path)
 
@@ -75,10 +77,12 @@ def grade_batch(essays_path: str, instruction: str):
 
         answer_dict = {
             "id": id,
+            "original_text": essay_content,
             "grade_content": answer.content,
         }
 
-        yield answer_dict  # Yield the result immediately
+        yield (essay_content, answer_dict)  # Yield the result immediately
+
 
 if __name__ == "__main__":
     main()
