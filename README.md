@@ -3,7 +3,6 @@
 # Essay Judge
 
 1. 確定自己的路徑在 essay-judge/ 下
-![alt text](image.png)
 
 2. 確定自己有client_secret_desktop.json檔案，並放在essay-judge/private下
 
