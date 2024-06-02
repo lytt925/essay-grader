@@ -103,6 +103,7 @@ class Interface(tk.Tk):
         self.name_dropdown.grid(
             row=0, column=1, padx=(2, 10), pady=5, sticky="w")
         self.name_dropdown.bind("<<ComboboxSelected>>", self.on_essay_select)
+        self.name_dropdown.bind("<<ComboboxSelected>>", self.update_essay_text)
 
         self.button_next = tk.Button(
             self.right_frame, text="Next", command=self.next_essay)

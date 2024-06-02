@@ -174,7 +174,7 @@ def add_methods(cls):
 
     # Method to update the essay text when a new essay is selected
     def update_essay_text(self, event=None):
-        if self.essay_window:
+        if hasattr(self, 'essay_window'):
             current_id = self.name_dropdown.get()
             original_text = self.essay_collections[current_id]['original_text']
             self.essay_text.config(state=tk.NORMAL)
@@ -183,6 +183,11 @@ def add_methods(cls):
             self.essay_text.config(state=tk.DISABLED)
 
     def view_essay(self):
+        # remove the existing window if it exists
+        if hasattr(self, 'essay_window'):
+            if self.essay_window.winfo_exists():
+                return
+
         # Create a top-level window for viewing the essay
         self.essay_window = tk.Toplevel(self)
         self.essay_window.title("View Essay")
@@ -199,9 +204,6 @@ def add_methods(cls):
         original_text = self.essay_collections[current_id]['original_text']
         self.essay_text.insert(tk.END, original_text)
         self.essay_text.config(state=tk.DISABLED)
-
-        # Bind the update method to the dropdown selection event
-        self.name_dropdown.bind("<<ComboboxSelected>>", update_essay_text)
 
     def send_action(self, confirmation_window):
         # Disable all inputs and the grade button
