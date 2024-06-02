@@ -81,6 +81,7 @@ def add_methods(cls):
         self.name_dropdown.current(next_index)
         if (current_index != next_index):
             self.update_result_area()
+            self.update_essay_text()
 
     def browse_file(self):
         filepath = filedialog.askopenfilename(
@@ -171,6 +172,16 @@ def add_methods(cls):
             confirmation_window, text="Cancel", command=confirmation_window.destroy)
         cancel_btn.pack(side="right", padx=10, pady=10)
 
+    # Method to update the essay text when a new essay is selected
+    def update_essay_text(self, event=None):
+        if self.essay_window:
+            current_id = self.name_dropdown.get()
+            original_text = self.essay_collections[current_id]['original_text']
+            self.essay_text.config(state=tk.NORMAL)
+            self.essay_text.delete(1.0, tk.END)
+            self.essay_text.insert(tk.END, original_text)
+            self.essay_text.config(state=tk.DISABLED)
+
     def view_essay(self):
         # Create a top-level window for viewing the essay
         self.essay_window = tk.Toplevel(self)
@@ -183,18 +194,11 @@ def add_methods(cls):
 
         # Initially populate the text widget with the current essay's text
         current_id = self.name_dropdown.get()
+        if current_id not in self.essay_collections:
+            return
         original_text = self.essay_collections[current_id]['original_text']
         self.essay_text.insert(tk.END, original_text)
         self.essay_text.config(state=tk.DISABLED)
-
-        # Method to update the essay text when a new essay is selected
-        def update_essay_text(event):
-            current_id = self.name_dropdown.get()
-            original_text = self.essay_collections[current_id]['original_text']
-            self.essay_text.config(state=tk.NORMAL)
-            self.essay_text.delete(1.0, tk.END)
-            self.essay_text.insert(tk.END, original_text)
-            self.essay_text.config(state=tk.DISABLED)
 
         # Bind the update method to the dropdown selection event
         self.name_dropdown.bind("<<ComboboxSelected>>", update_essay_text)
@@ -244,5 +248,6 @@ def add_methods(cls):
     cls.on_essay_select = on_essay_select
     cls.open_confirmation = open_confirmation
     cls.view_essay = view_essay
+    cls.update_essay_text = update_essay_text
 
     return cls

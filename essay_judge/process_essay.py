@@ -80,7 +80,7 @@ def grade_batch(essays_path: str, instruction: str):
             "grade_content": answer.content,
         }
 
-        yield (essay_content, answer_dict)  # Yield the result immediately
+        yield answer_dict
 
 
 if __name__ == "__main__":

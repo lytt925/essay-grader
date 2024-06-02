@@ -18,7 +18,7 @@ textract = "^1.6.5"
 
 [tool.poetry.plugins.dotenv]
 ignore = "false"
-location = ".env"
+location = "./private/.env"
 
 [tool.poetry.scripts]
 start = "essay_judge.main:main"
