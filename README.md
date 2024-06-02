@@ -10,7 +10,6 @@
 
 ```
 OPENAI_API_KEY=sk-proj-
-HUGGINGFACEHUB_API_TOKEN=hf
 ```
 
 4. `poetry install` : 安裝所需套件
