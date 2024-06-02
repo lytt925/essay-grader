@@ -1,6 +1,6 @@
 
 
-# Essay Judge
+# Essay Grader
 
 1. 確定自己的路徑在 essay-judge/ 下
 
