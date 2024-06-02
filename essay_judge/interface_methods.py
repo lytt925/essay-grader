@@ -122,7 +122,7 @@ def toggle_inputs(self, state):
     self.button_regrade.config(state='normal' if state else 'disabled')
     # self.button_next.config(state='normal' if state else 'disabled')
     # self.name_dropdown.config(state='normal' if state else 'disabled')
-    self.button_send.config(state='normal' if state else 'disabled')
+    # self.button_send.config(state='normal' if state else 'disabled')
 
 # Change combobox value and update result area
 def on_essay_select(self, event):
@@ -144,21 +144,26 @@ def grade_all_thread(self, filepath, instruction, grade_one=False):
     self.progress_bar['value'] = 0
     self.progress_bar['maximum'] = len(
         self.essay_collections) if not grade_one else 1
-    for result in grade_batch(filepath, instruction):
-        self.essay_collections[result["id"]
-                                ]['original_text'] = result["original_text"]
-        self.essay_collections[result["id"]
-                                ]['grade_content'] = result["grade_content"]
-        self.after(0, self.update_result_area)
-        self.progress_bar['value'] += 1
-
+    
     new_records = {
         "dirpath": os.path.expanduser(self.entry_filepath.get()),
         "instruction": self.text_instruction.get("1.0", tk.END).strip(),
         "essay_collections": self.essay_collections
     }
+
+    for result in grade_batch(filepath, instruction):
+        self.essay_collections[result["id"]
+                                ]['original_text'] = result["original_text"]
+        self.essay_collections[result["id"]
+                                ]['grade_content'] = result["grade_content"]
+        if result["id"] == self.name_dropdown.get():
+            self.after(0, self.update_result_area)
+        self.progress_bar['value'] += 1
+
+        new_records['essay_collections'] = self.essay_collections
+        save_to_json('./results/data.json', new_records)
+
     self.after(0, self.toggle_inputs, True)
-    save_to_json('./results/data.json', new_records)
 
 def open_confirmation(self):
     # Create a top-level window for the confirmation dialog
