@@ -25,8 +25,9 @@ SCOPES = [
 
 def send_mail(mail: Mail):
     creds = None
-    if os.path.exists("./private/token.json"):
-        creds = Credentials.from_authorized_user_file("./private/token.json", SCOPES)
+    token_path = "./private/token.json"
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -38,7 +39,7 @@ def send_mail(mail: Mail):
 
             creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open("./private/token.json", "w") as token:
+            with open(token_path, "w") as token:
                 token.write(creds.to_json())
 
     service = build('gmail', 'v1', credentials=creds)

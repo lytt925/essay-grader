@@ -58,14 +58,14 @@ def add_methods(cls):
             files = os.listdir(os.path.expanduser(dirpath))
             for file in files:
                 if file.endswith(".docx"):
-                    [id, filename] = file.split("_")
+                    [student_id, _] = file.split("_")
                     essay_collection = {
                         "filename": os.path.join(os.path.expanduser(dirpath), file),
                         "original_text": "",
                         "grade_content": ""
                     }
                     if id not in self.essay_collections:
-                        self.essay_collections[id] = essay_collection
+                        self.essay_collections[student_id] = essay_collection
 
             self.name_dropdown['values'] = list(self.essay_collections.keys())
             self.name_dropdown.current(0)
@@ -183,9 +183,8 @@ def add_methods(cls):
 
     def view_essay(self):
         # remove the existing window if it exists
-        if hasattr(self, 'essay_window'):
-            if self.essay_window.winfo_exists():
-                return
+        if hasattr(self, 'essay_window') and self.essay_window.winfo_exists():
+            return
 
         # Create a top-level window for viewing the essay
         self.essay_window = tk.Toplevel(self)
