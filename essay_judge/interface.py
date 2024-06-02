@@ -150,8 +150,10 @@ class Interface(tk.Tk):
                               padx=(10, 20), pady=20, sticky="e")
 
 
-add_methods(Interface)
-
-if __name__ == "__main__":
+def main():
+    add_methods(Interface)
     app = Interface()
     app.mainloop()
+
+if __name__ == "__main__":
+    main()

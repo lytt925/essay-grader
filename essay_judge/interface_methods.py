@@ -121,7 +121,6 @@ def add_methods(cls):
         self.progress_bar['maximum'] = len(
             self.essay_collections) if not grade_one else 1
         for result in grade_batch(filepath, instruction):
-            print(result)
             self.essay_collections[result["id"]
                                    ]['original_text'] = result["original_text"]
             self.essay_collections[result["id"]

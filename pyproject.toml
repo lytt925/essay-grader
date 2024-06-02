@@ -21,8 +21,7 @@ ignore = "false"
 location = "./private/.env"
 
 [tool.poetry.scripts]
-start = "essay_judge.main:main"
-send = "essay_judge.mail:send_mail"
+start = "essay_judge.interface:main"
 
 [build-system]
 requires = ["poetry-core"]
