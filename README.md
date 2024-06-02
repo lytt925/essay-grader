@@ -2,11 +2,11 @@
 
 # Essay Grader
 
-1. 確定自己的路徑在 essay-judge/ 下
+1. 確定自己的路徑在 essay-grader/ 下
 
-2. 確定自己有client_secret_desktop.json檔案，並放在essay-judge/private下
+2. 確定自己有client_secret_desktop.json檔案，並放在essay-grader/private下
 
-3. 確定自己有把 `.env` 檔案放在 essay-judge/private 下
+3. 確定自己有把 `.env` 檔案放在 essay-grader/private 下
 
 ```
 OPENAI_API_KEY=sk-proj-
