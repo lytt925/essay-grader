@@ -54,8 +54,7 @@ def main():
     # res = send_mail(mail)
     # print(res)
 
-
-def save_results(new_results, output_file='data.json'):
+def save_results(new_results, output_file = './results/data.json'):
     # read output_file to dict
     if os.path.exists(output_file):
         with open(output_file, 'r', encoding='utf-8') as f:
