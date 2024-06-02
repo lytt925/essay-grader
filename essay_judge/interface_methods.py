@@ -21,10 +21,10 @@ def start_grading_thread(self, filepath, instruction, grade_one=False):
 
 def grade_all(self):
     self.toggle_inputs(False)
-    filepath = self.entry_filepath.get()
+    dirpath = os.path.expanduser(self.entry_filepath.get())
     instruction = self.text_instruction.get("1.0", tk.END).strip()
-    if self.validate_input(filepath, instruction):
-        self.start_grading_thread(filepath, instruction)
+    if self.validate_input(dirpath, instruction):
+        self.start_grading_thread(dirpath, instruction)
 
 def grade_one(self):
     self.toggle_inputs(False)
@@ -35,7 +35,7 @@ def grade_one(self):
         if self.validate_input(filepath, instruction):
             self.start_grading_thread(filepath, instruction, True)
 
-def browse_dir(self):
+def select_dir(self):
     initial_directory = self.last_selected_directory if self.last_selected_directory else os.path.expanduser(
         '~/Desktop/course1122/ComputationalLinguistics/Final Project/essay-local/essay-judge/essays')
     dirpath = filedialog.askdirectory(
@@ -43,34 +43,56 @@ def browse_dir(self):
         initialdir=initial_directory
     )
     if dirpath:
-        # Get the user's home directory path
+        # Show only the relative path to the home directory
         home = os.path.expanduser('~')
-        # Check if the file path starts with the user's home directory path
         if dirpath.startswith(home):
-            # Create a relative path using '~' instead of the full home directory path
-            dirpath = '~' + dirpath[len(home):]
+            home_dirpath = '~' + dirpath[len(home):]
         self.entry_filepath.delete(0, 'end')
-        self.entry_filepath.insert(0, dirpath)
+        self.entry_filepath.insert(0, home_dirpath)
+
+        # Get the user's home directory path
+        if self.last_selected_directory != dirpath:
+            self.essay_collections = {}
+            browse_dir(self)
         self.last_selected_directory = dirpath
 
-        self.essay_collections = {}
-        files = os.listdir(os.path.expanduser(dirpath))
-        for file in files:
-            if file.endswith(".docx"):
-                [student_id, _] = file.split("_")
-                essay_collection = {
-                    "filename": os.path.join(os.path.expanduser(dirpath), file),
-                    "original_text": "",
-                    "grade_content": ""
-                }
-                if student_id not in self.essay_collections:
-                    self.essay_collections[student_id] = essay_collection
-
-        self.name_dropdown['values'] = list(self.essay_collections.keys())
-        self.name_dropdown.current(0)
+    # find history and update the essay_collections
+    self.load_history(self.history_path)
 
     # focus back to the window
     self.focus_force()
+
+
+def browse_dir(self):
+    dirpath = self.entry_filepath.get()
+    files = os.listdir(os.path.expanduser(dirpath))
+    for file in files:
+        if file.endswith(".docx"):
+            fullpath = os.path.join(os.path.expanduser(dirpath), file)
+            [student_id, _] = file.split("_", 1)
+            essay_collection = {
+                "filename": fullpath,
+                "original_text": "",
+                "grade_content": ""
+            }
+            if student_id not in self.essay_collections:
+                self.essay_collections[student_id] = essay_collection
+
+    # check essay_collections[filename] is in current directory or not
+    for key in list(self.essay_collections.keys()):
+        fullpath = self.essay_collections[key]['filename']
+        basepath = os.path.basename(fullpath)
+        if basepath not in files:
+            del self.essay_collections[key]
+
+    self.name_dropdown.set('')
+    self.name_dropdown['values'] = list(self.essay_collections.keys())
+
+    if len(self.essay_collections.keys()) > 0:
+        self.name_dropdown.current(0)
+
+    self.update_result_area()
+    self.update_essay_text()
 
 def next_essay(self):
     if len(self.essay_collections.keys()) == 0:
@@ -104,12 +126,15 @@ def toggle_inputs(self, state):
 
 # Change combobox value and update result area
 def on_essay_select(self, event):
-    print("Selected:", self.name_dropdown.get())
     self.update_result_area()
 
 def update_result_area(self):
     # get current combobox value
     current_id = self.name_dropdown.get()
+    if current_id not in self.essay_collections:
+        # clear the text result area
+        self.text_result.delete('1.0', tk.END)
+        return
     content = self.essay_collections[current_id]['grade_content']
     self.text_result.delete('1.0', tk.END)  # Clear existing content
     self.text_result.insert('1.0', content)  # Insert new content
@@ -128,7 +153,7 @@ def grade_all_thread(self, filepath, instruction, grade_one=False):
         self.progress_bar['value'] += 1
 
     new_records = {
-        "dirpath": self.entry_filepath.get(),
+        "dirpath": os.path.expanduser(self.entry_filepath.get()),
         "instruction": self.text_instruction.get("1.0", tk.END).strip(),
         "essay_collections": self.essay_collections
     }
@@ -174,6 +199,11 @@ def open_confirmation(self):
 def update_essay_text(self, event=None):
     if hasattr(self, 'essay_window') and self.essay_window.winfo_exists():
         current_id = self.name_dropdown.get()
+        if current_id not in self.essay_collections:
+            # clear the text result area
+            self.essay_text.config(state=tk.NORMAL)
+            self.essay_text.delete(1.0, tk.END)
+            return
         original_text = self.essay_collections[current_id]['original_text']
         self.essay_text.config(state=tk.NORMAL)
         self.essay_text.delete(1.0, tk.END)
@@ -239,6 +269,7 @@ def add_methods(cls):
     cls.validate_input = validate_input
     cls.start_grading_thread = start_grading_thread
     cls.browse_dir = browse_dir
+    cls.select_dir = select_dir
     cls.next_essay = next_essay
     cls.browse_file = browse_file
     cls.toggle_inputs = toggle_inputs

@@ -16,31 +16,36 @@ class Interface(tk.Tk):
         self.create_panes()
         self.last_selected_directory = None
         self.essay_collections = {}
-        self.load_history()
+        self.history_path = './results/data.json'
+        self.load_history(self.history_path)
 
-    def load_history(self):
-        historys = load_from_json('./results/data.json')
+    def load_history(self, path):
+        historys = load_from_json(path)
+        if_history_found = False
         if len(historys) == 0:
             return
-        self.history = historys[-1]
+        if self.last_selected_directory is None:
+            self.history = historys[-1]
+            if_history_found = True
+        else:
+            for history in reversed(historys):
+                if history['dirpath'] == self.last_selected_directory:
+                    self.history = history
+                    if_history_found = True
+                    break
 
-        self.last_selected_directory = self.history['dirpath']
-        self.entry_filepath.insert(0, self.last_selected_directory)
-        instruction = self.history['instruction']
-        self.text_instruction.delete("1.0", tk.END)
-        self.text_instruction.insert(tk.END, instruction)
+        if if_history_found:
+            self.last_selected_directory = self.history['dirpath']
+            self.entry_filepath.delete(0, tk.END)
+            self.entry_filepath.insert(0, self.last_selected_directory)
+            self.text_instruction.delete(1.0, tk.END)
+            self.text_instruction.insert(tk.END, self.history['instruction'])
+            self.essay_collections = self.history['essay_collections']
+        
+        else:
+            self.essay_collections = {}
 
-        for id, essay_collection in self.history['essay_collections'].items():
-            # check if the file still exists
-            if os.path.exists(essay_collection['filename']):
-                self.essay_collections[id] = essay_collection
-
-        # update the dropdown
-        self.name_dropdown['values'] = list(self.essay_collections.keys())
-        self.name_dropdown.current(0)
-
-        # update the result
-        self.update_result_area()
+        self.browse_dir()
 
     def create_panes(self):
         self.pane = tk.PanedWindow(
@@ -67,7 +72,7 @@ class Interface(tk.Tk):
         self.entry_filepath.grid(
             row=0, column=1, sticky="ew", padx=(2, 2), pady=5)
         self.button_browse = tk.Button(
-            self.left_frame, text="Browse", command=self.browse_dir)
+            self.left_frame, text="Browse", command=self.select_dir)
         self.button_browse.grid(
             row=0, column=2, sticky="ew", padx=(2, 15), pady=5)
 
