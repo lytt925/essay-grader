@@ -178,7 +178,7 @@ def open_confirmation(self):
                         text="Are you sure you want to send the email?")
     label.pack(pady=10, fill=tk.X)
 
-    to = "To: " + self.name_dropdown.get() + "@ntu.edu.tw"
+    to = "To: " + self.name_dropdown.get()
     subject = 'Email Subject: ' + self.entry_emailsubject.get()
 
     # Email Address Label
@@ -242,7 +242,7 @@ def view_essay(self):
 def send_action(self, confirmation_window):
     # Disable all inputs and the grade button
     self.toggle_inputs(False)
-    email = self.name_dropdown.get() + "@ntu.edu.tw"
+    email = self.name_dropdown.get()
     mail_subject = self.entry_emailsubject.get()
     original_text = self.essay_collections[self.name_dropdown.get(
     )]['original_text']
