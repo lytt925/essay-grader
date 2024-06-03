@@ -264,7 +264,12 @@ def send_action(self, confirmation_window):
     confirmation_window.destroy()
 
 def tk_send_mail_thread(self, mail):
-    res = send_mail(mail)
+    try:
+        res = send_mail(mail)
+    except Exception as e:
+        print("Error:", e)
+        self.after(0, self.toggle_inputs, True)
+        return {"message": "Failed to send email"}
     print("OK:", res)
     self.after(0, self.toggle_inputs, True)
     return {"message": "Email sent successfully"}
