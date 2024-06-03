@@ -47,6 +47,8 @@ def select_dir(self):
         home = os.path.expanduser('~')
         if dirpath.startswith(home):
             home_dirpath = '~' + dirpath[len(home):]
+        else:
+            home_dirpath = dirpath
         self.entry_filepath.delete(0, 'end')
         self.entry_filepath.insert(0, home_dirpath)
 
