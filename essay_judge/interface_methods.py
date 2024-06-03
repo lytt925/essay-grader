@@ -37,7 +37,7 @@ def grade_one(self):
 
 def select_dir(self):
     initial_directory = self.last_selected_directory if self.last_selected_directory else os.path.expanduser(
-        '~/Desktop/course1122/ComputationalLinguistics/Final Project/essay-local/essay-judge/essays')
+        '~/Desktop/course1122/ComputationalLinguistics/Final Project/essay-grader/essays')
     dirpath = filedialog.askdirectory(
         title="Select a directory",
         initialdir=initial_directory
@@ -247,6 +247,8 @@ def send_action(self, confirmation_window):
     original_text = self.essay_collections[self.name_dropdown.get(
     )]['original_text']
     result = self.text_result.get("1.0", tk.END).strip()
+    original_text = original_text.replace('\n', '<br>')
+    result = result.replace('\n', '<br>')
     mail_content = f"""
     <strong>原文：</strong> <br>
     {original_text}
