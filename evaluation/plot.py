@@ -9,8 +9,8 @@ plt.scatter(data['Batch1'], data['Batch2'])
 plt.xlabel("Batch1")
 plt.ylabel("Batch2")
 
-# Show the plot
-plt.show()
-
 # Save the plot
 plt.savefig('scores.png')
+
+# Show the plot
+plt.show()
