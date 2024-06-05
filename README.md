@@ -12,9 +12,9 @@
 OPENAI_API_KEY=sk-proj-
 ```
 
-4. `poetry install` : 安裝所需套件
+4. 安裝所需套件： `poetry install`
 
-5. `poetry run start`：執行程式
+5. 執行程式： `poetry run start`
 
 
 ## 沒有Poetry的安裝方式
